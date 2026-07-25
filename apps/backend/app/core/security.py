@@ -48,8 +48,9 @@ def create_access_token(
 def create_refresh_token(
     user_id: int,
     email: str,
-) -> str:
+) -> tuple[str, datetime]:
     now = datetime.now(timezone.utc)
+
     expires_at = now + timedelta(
         days=settings.REFRESH_TOKEN_EXPIRE_DAYS
     )
@@ -62,11 +63,13 @@ def create_refresh_token(
         "exp": expires_at,
     }
 
-    return jwt.encode(
+    token = jwt.encode(
         payload,
         settings.SECRET_KEY,
         algorithm=settings.ALGORITHM,
     )
+
+    return token, expires_at
 
 
 def decode_token(token: str) -> dict[str, Any]:
